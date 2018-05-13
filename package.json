@@ -41,8 +41,5 @@
     "karma-jasmine": "^1.1.0",
     "karma-jasmine-jquery": "^0.1.1"
   },
-  "peerDependencies": {
-    "jquery": "*"
-  },
   "dependencies": {}
 }

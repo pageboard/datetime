@@ -24,13 +24,11 @@ describe('UI suite', function(){
 
     beforeEach(function () {
         setFixtures('<input id="dt" type="text" />');
-        $input = $('#dt');
-        $input.datetime({
-
+        plug = DateTimeEntry('#dt', {
             locale: 'en',
             format:  format
         });
-        plug = $input.data().datetime;
+        $input = $(plug.element);
 
     });
 

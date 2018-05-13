@@ -28,15 +28,13 @@ describe('Date suite', function(){
 
     beforeEach(function () {
         setFixtures('<input id="dt" type="text" />');
-        $input = $('#dt');
-        $input.datetime({
+        plug = DateTimeEntry('#dt', {
             locale: 'ru',
             format:  format,
             minDate: new Date('01/01/2017 12:00:00 UTC'),
             maxDate: new Date('01/10/2017 00:00:00 UTC')
-
         });
-        plug = $input.data().datetime;
+        $input = $(plug.element);
 
     });
 

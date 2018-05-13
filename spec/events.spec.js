@@ -6,7 +6,8 @@
 
 describe('Events suite', function(){
 
-    let $input;
+    let $input,
+        plug;
 
     const format =  {
         hour12:  false,
@@ -25,20 +26,18 @@ describe('Events suite', function(){
 
     beforeEach(function () {
         setFixtures('<input id="dt" type="text" />');
-        $input = $('#dt');
-        $input.datetime({
+        plug = DateTimeEntry('#dt', {
             locale: 'ru',
             format:  format,
             datetime: new Date(1487136412359) // 15 февраля 2017 05:26:52
         });
+        $input = $(plug.element);
 
     });
 
 
 
     it('For 15 февраля 2017 05:26:52 click between ф and е should select 3, 10 ', function(){
-
-        let plug = $input.data().datetime;
 
         let fakeEvent = {
             preventDefault: function(){},

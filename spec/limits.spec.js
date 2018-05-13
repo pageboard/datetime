@@ -28,13 +28,12 @@ describe('Fit', function(){
 
     beforeEach(function () {
         setFixtures('<input id="dt" type="text" />');
-        $input = $('#dt');
-        $input.datetime({
+        plug = DateTimeEntry('#dt', {
             locale: 'ru',
             format:  format,
             datetime: new Date(1487136412359) // 15 февраля 2017 05:26:52
         });
-        plug = $input.data().datetime;
+        $input = $(plug.element);
 
     });
 
