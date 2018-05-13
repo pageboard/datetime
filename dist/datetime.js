@@ -68,14 +68,14 @@
 
         var _props = Object.assign({}, defaultProps, props);
 
+        if (typeof element == "string") element = document.querySelector(element);
+        this.element = element;
+
         this.state = {
             type: undefined,
             parts: [],
-            datetime: new Date(_props.datetime)
+            datetime: _props.datetime || element.value
         };
-
-        if (typeof element == "string") element = document.querySelector(element);
-        this.element = element;
 
         this._handleMouseDown = this._handleMouseDown.bind(this);
         this._handleKeydown = this._handleKeydown.bind(this);
@@ -193,6 +193,10 @@
 
             var parts = void 0,
                 type = void 0;
+
+            if (typeof datetime == "string" && /^\d{1,2}\:\d{1,2}/.test(datetime)) {
+                datetime = "0 " + datetime;
+            }
 
             datetime = new Date(datetime);
 
