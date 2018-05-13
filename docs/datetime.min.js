@@ -4,7 +4,7 @@
  * Created by Serge Balykov (ua9msn@mail.ru) on 2/1/17.
  */
 
-(function ($, window, document, undefined) {
+(function (window, document, undefined) {
 
     /* eslint-disable no-unused-vars */
     var KEY_TAB = 9,
@@ -49,8 +49,7 @@
         day: 'numeric'
     };
 
-    var pluginName = 'datetime',
-        defaultProps = {
+    var defaultProps = {
         datetime: NaN,
         locale: navigator.language,
         format: FORMAT,
@@ -62,7 +61,10 @@
         onChange: function onChange(t) {}
     };
 
+    window.DateTimeEntry = Plugin;
+
     function Plugin(element, props) {
+        if (!(this instanceof Plugin)) return new Plugin(element, props);
 
         var _props = Object.assign({}, defaultProps, props);
 
@@ -72,8 +74,8 @@
             datetime: new Date(_props.datetime)
         };
 
-        this.$element = element;
-        this.element = element[0];
+        if (typeof element == "string") element = document.querySelector(element);
+        this.element = element;
 
         this._handleMouseDown = this._handleMouseDown.bind(this);
         this._handleKeydown = this._handleKeydown.bind(this);
@@ -151,8 +153,6 @@
             this.element.removeEventListener('mouseup', this._handleMouseDown);
             this.element.removeEventListener('keydown', this._handleKeydown);
             this.element.removeEventListener('mousewheel', this._handleMousewheel);
-            this.$element.off();
-            this.$element.data(pluginName, null);
         },
 
 
@@ -599,36 +599,14 @@
         },
         _notify: function _notify() {
             this.props.onChange(this.state.datetime);
-            this.$element.trigger('change', this.state.datetime);
+            var e;
+            if (document.createEvent) {
+                e = document.createEvent('HTMLEvents');
+                e.initEvent('change', true, true);
+            } else {
+                e = new Event('change', { bubbles: true, cancelable: true });
+            }
+            this.element.dispatchEvent(e);
         }
     };
-
-    // A really lightweight plugin wrapper around the constructor,
-    // preventing against multiple instantiations
-    $.fn[pluginName] = function (method, options) {
-
-        /* eslint-disable no-console */
-        if (!this.data(pluginName)) {
-
-            if (typeof method === 'string') {
-                console.warn('datetime plugin expect options object as first argument');
-                return;
-            }
-
-            this.data(pluginName, new Plugin(this, method));
-
-            return this;
-        } else {
-            //calling method
-            var instance = this.data(pluginName);
-
-            if (typeof instance[method] !== 'function') {
-                console.warn('method ', method, ' not exist');
-                return;
-            }
-
-            return instance[method](options);
-        }
-        /* eslint-enable no-console */
-    };
-})(jQuery, window, document);
+})(window, document);
