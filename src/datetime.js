@@ -75,6 +75,7 @@
             datetime: _props.datetime || element.value
         };
 
+        this._handleFocus = this._handleFocus.bind(this);
         this._handleMouseDown = this._handleMouseDown.bind(this);
         this._handleKeydown   = this._handleKeydown.bind(this);
         this._handleMousewheel = this._handleMousewheel.bind(this);
@@ -82,6 +83,7 @@
         this.element.setSelectionRange(0, 0);
 
         // this.element.addEventListener('select', this.handleSelection.bind(this));
+        this.element.addEventListener('focus', this._handleFocus);
         this.element.addEventListener('mouseup', this._handleMouseDown);
         this.element.addEventListener('keydown', this._handleKeydown);
         this.element.addEventListener('mousewheel', this._handleMousewheel);
@@ -151,6 +153,7 @@
 
         destroy(){
 
+            this.element.removeEventListener('focus', this._handleFocus);
             this.element.removeEventListener('mouseup', this._handleMouseDown);
             this.element.removeEventListener('keydown', this._handleKeydown);
             this.element.removeEventListener('mousewheel', this._handleMousewheel);
@@ -217,6 +220,10 @@
             //     this.props.onChange(datetime);
             // });
 
+        },
+
+        _handleFocus(e){
+            this._render();
         },
 
         _handleMouseDown(e){
