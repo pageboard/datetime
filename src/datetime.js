@@ -269,14 +269,14 @@
                 case KEY_LEFT: {
                     e.preventDefault();
                     const type = this._getNextTypeInDirection(-1);
-                    this.setState({type});
+                    if (type) this.setState({type});
                     break;
                 }
 
                 case KEY_RIGHT: {
                     e.preventDefault();
                     const type = this._getNextTypeInDirection(1);
-                    this.setState({type});
+                    if (type) this.setState({type});
                     break;
                 }
 
@@ -302,6 +302,14 @@
 
                     break;
                 }
+
+                case KEY_TAB:
+                    const type = this._getNextTypeInDirection(e.shiftKey ? -1 : 1);
+                    if (type) {
+                        e.preventDefault();
+                        this.setState({type});
+                    }
+                    break;
 
                 case KEY_A:
                 case KEY_C: {
@@ -368,7 +376,7 @@
                 ono = this.state.parts[index] && this.state.parts[index].type !== 'literal';
             }
 
-            return this.state.parts[ono ? index : curIndex].type;
+            return (ono ? this.state.parts[index] : {}).type;
         },
 
         _crement(operator, type){
