@@ -133,7 +133,7 @@
                 this.props.minTime = isNaN(this.props.minTime) ? 0 : this.props.minTime;
             }
 
-            const state = this._setDateTime( 'datetime' in props ? props.datetime : this.state.datetime );
+            const state = this._setDateTime( !isNaN(props.datetime) ? props.datetime : this.state.datetime );
 
             this.setState(state);
 
