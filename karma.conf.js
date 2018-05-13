@@ -15,7 +15,7 @@ module.exports = function(config){
 
         // list of files / patterns to load in the browser
         files: [
-            'vendor/jquery.js',
+            require.resolve('jquery'),
             'dist/datetime.js',
             'spec/**/*.spec.js',
             {
