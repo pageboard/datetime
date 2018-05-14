@@ -74,9 +74,11 @@
         this.state = {
             type: undefined,
             parts: [],
-            datetime: _props.datetime || element.value
+            datetime: _props.datetime || element.value,
+            step: _props.step || parseInt(element.getAttribute('step'))
         };
 
+        this._handleFocus = this._handleFocus.bind(this);
         this._handleMouseDown = this._handleMouseDown.bind(this);
         this._handleKeydown = this._handleKeydown.bind(this);
         this._handleMousewheel = this._handleMousewheel.bind(this);
@@ -84,6 +86,7 @@
         this.element.setSelectionRange(0, 0);
 
         // this.element.addEventListener('select', this.handleSelection.bind(this));
+        this.element.addEventListener('focus', this._handleFocus);
         this.element.addEventListener('mouseup', this._handleMouseDown);
         this.element.addEventListener('keydown', this._handleKeydown);
         this.element.addEventListener('mousewheel', this._handleMousewheel);
@@ -132,7 +135,7 @@
                 this.props.minTime = isNaN(this.props.minTime) ? 0 : this.props.minTime;
             }
 
-            var state = this._setDateTime('datetime' in props ? props.datetime : this.state.datetime);
+            var state = this._setDateTime(!isNaN(props.datetime) ? props.datetime : this.state.datetime);
 
             this.setState(state);
 
@@ -150,6 +153,7 @@
 
         destroy: function destroy() {
 
+            this.element.removeEventListener('focus', this._handleFocus);
             this.element.removeEventListener('mouseup', this._handleMouseDown);
             this.element.removeEventListener('keydown', this._handleKeydown);
             this.element.removeEventListener('mousewheel', this._handleMousewheel);
@@ -192,13 +196,19 @@
         _setDateTime: function _setDateTime(datetime) {
 
             var parts = void 0,
-                type = void 0;
+                type = void 0,
+                step = this.state.step;
 
             if (typeof datetime == "string" && /^\d{1,2}\:\d{1,2}/.test(datetime)) {
                 datetime = "0 " + datetime;
             }
 
             datetime = new Date(datetime);
+
+            if (!isNaN(step)) {
+                step = step * 1000;
+                datetime = new Date(Math.floor(datetime.getTime() / step) * step);
+            }
 
             datetime = this._fitToLimits(datetime);
 
@@ -212,7 +222,7 @@
                 type = undefined;
             }
 
-            return { datetime: datetime, parts: parts, type: type };
+            return { datetime: datetime, parts: parts, type: type, step: this.state.step };
 
             // this.setState({
             //     type,
@@ -221,6 +231,9 @@
             // }, () => {
             //     this.props.onChange(datetime);
             // });
+        },
+        _handleFocus: function _handleFocus(e) {
+            this._render();
         },
         _handleMouseDown: function _handleMouseDown(e) {
 
@@ -269,23 +282,23 @@
                 case KEY_LEFT:
                     {
                         e.preventDefault();
-                        var type = this._getNextTypeInDirection(-1);
-                        this.setState({ type: type });
+                        var _type = this._getNextTypeInDirection(-1);
+                        if (_type) this.setState({ type: _type });
                         break;
                     }
 
                 case KEY_RIGHT:
                     {
                         e.preventDefault();
-                        var _type = this._getNextTypeInDirection(1);
-                        this.setState({ type: _type });
+                        var _type2 = this._getNextTypeInDirection(1);
+                        if (_type2) this.setState({ type: _type2 });
                         break;
                     }
 
                 case KEY_UP:
                     {
                         e.preventDefault();
-                        var newDatetime = this._crement(1, this.state.type);
+                        var newDatetime = this._crement(1, this.state);
                         var newState = this._setDateTime(newDatetime);
                         this.setState(newState, this._notify);
                         break;
@@ -293,7 +306,7 @@
                 case KEY_DOWN:
                     {
                         e.preventDefault();
-                        var _newDatetime = this._crement(-1, this.state.type);
+                        var _newDatetime = this._crement(-1, this.state);
                         var _newState = this._setDateTime(_newDatetime);
                         this.setState(_newState, this._notify);
                         break;
@@ -307,6 +320,14 @@
 
                         break;
                     }
+
+                case KEY_TAB:
+                    var type = this._getNextTypeInDirection(e.shiftKey ? -1 : 1);
+                    if (type) {
+                        e.preventDefault();
+                        this.setState({ type: type });
+                    }
+                    break;
 
                 case KEY_A:
                 case KEY_C:
@@ -376,10 +397,11 @@
                 ono = this.state.parts[index] && this.state.parts[index].type !== 'literal';
             }
 
-            return this.state.parts[ono ? index : curIndex].type;
+            return (ono ? this.state.parts[index] : {}).type;
         },
-        _crement: function _crement(operator, type) {
+        _crement: function _crement(operator, state) {
 
+            var type = state.type;
             var part = this.state.parts.find(function (p) {
                 return p.type === type;
             });
@@ -387,6 +409,7 @@
             var dt = !isNaN(this.state.datetime) && this.state.datetime || this.props.preset || Date.now();
 
             var proxyTime = new Date(dt);
+            var stamp = proxyTime.getTime();
 
             if (!part || type === 'literal') return proxyTime;
 
@@ -402,6 +425,12 @@
             }
 
             proxyTime['set' + fnName](newValue);
+            var newstamp = proxyTime.getTime();
+            var step = state.step;
+            if (!isNaN(step) && Math.abs(newstamp - stamp) < step * 1000) {
+                newstamp = stamp + operator * step * 1000;
+                proxyTime = new Date(newstamp);
+            }
 
             return this._fitToLimits(proxyTime);
         },
