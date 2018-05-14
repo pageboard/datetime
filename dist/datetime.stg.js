@@ -365,7 +365,7 @@
 
             var direction = Math.sign(e.wheelDelta);
 
-            var newDatetime = this._crement(direction, this.state.type);
+            var newDatetime = this._crement(direction, this.state);
             var newState = this._setDateTime(newDatetime);
             this.setState(newState, this._notify);
 
