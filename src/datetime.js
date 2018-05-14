@@ -72,7 +72,8 @@
         this.state = {
             type:     undefined,
             parts:    [],
-            datetime: _props.datetime || element.value
+            datetime: _props.datetime || element.value,
+            step:     _props.step || parseInt(element.getAttribute('step'))
         };
 
         this._handleFocus = this._handleFocus.bind(this);
@@ -192,13 +193,18 @@
 
         _setDateTime(datetime){
 
-            let parts, type;
+            let parts, type, step = this.state.step;
 
             if (typeof datetime == "string" && /^\d{1,2}\:\d{1,2}/.test(datetime)) {
                 datetime = "0 " + datetime;
             }
 
             datetime = new Date(datetime);
+
+            if (!isNaN(step)) {
+                step = step * 1000;
+                datetime = new Date(Math.floor(datetime.getTime() / step) * step);
+            }
 
             datetime = this._fitToLimits(datetime);
 
@@ -210,7 +216,7 @@
                 type  = undefined;
             }
 
-            return({datetime, parts, type});
+            return({datetime, parts, type, step: this.state.step});
 
             // this.setState({
             //     type,
@@ -289,14 +295,14 @@
 
                 case KEY_UP: {
                     e.preventDefault();
-                    const newDatetime = this._crement(1, this.state.type);
+                    const newDatetime = this._crement(1, this.state);
                     const newState    = this._setDateTime(newDatetime);
                     this.setState(newState, this._notify);
                     break;
                 }
                 case KEY_DOWN: {
                     e.preventDefault();
-                    const newDatetime = this._crement(-1, this.state.type);
+                    const newDatetime = this._crement(-1, this.state);
                     const newState    = this._setDateTime(newDatetime);
                     this.setState(newState, this._notify);
                     break;
@@ -386,13 +392,15 @@
             return (ono ? this.state.parts[index] : {}).type;
         },
 
-        _crement(operator, type){
+        _crement(operator, state){
 
+            const type = state.type;
             const part = this.state.parts.find(p => p.type === type);
 
             const dt = ( !isNaN(this.state.datetime) && this.state.datetime ) || this.props.preset || Date.now();
 
-            const proxyTime = new Date(dt);
+            let proxyTime = new Date(dt);
+            const stamp = proxyTime.getTime();
 
             if(!part || type === 'literal') return proxyTime;
 
@@ -408,6 +416,12 @@
             }
 
             proxyTime['set' + fnName](newValue);
+            let newstamp = proxyTime.getTime();
+            const step = state.step;
+            if (!isNaN(step) && Math.abs(newstamp - stamp) < step * 1000) {
+                newstamp = stamp + operator * step * 1000;
+                proxyTime = new Date(newstamp);
+            }
 
             return this._fitToLimits(proxyTime);
 
