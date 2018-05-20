@@ -229,7 +229,11 @@
         },
 
         _handleFocus(e){
-            this._render();
+            if (e.target.selectionStart != e.target.selectionEnd) {
+                e.preventDefault();
+                e.target.focus();
+                this._handleMouseDown(e);
+            }
         },
 
         _handleMouseDown(e){
