@@ -299,16 +299,12 @@
 
                 case KEY_UP: {
                     e.preventDefault();
-                    const newDatetime = this._crement(1, this.state);
-                    const newState    = this._setDateTime(newDatetime);
-                    this.setState(newState, this._notify);
+                    this.step(1);
                     break;
                 }
                 case KEY_DOWN: {
                     e.preventDefault();
-                    const newDatetime = this._crement(-1, this.state);
-                    const newState    = this._setDateTime(newDatetime);
-                    this.setState(newState, this._notify);
+                    this.step(-1);
                     break;
                 }
 
@@ -366,10 +362,7 @@
 
             const direction = Math.sign(e.wheelDelta);
 
-            const newDatetime = this._crement(direction, this.state);
-            const newState    = this._setDateTime(newDatetime);
-            this.setState(newState, this._notify);
-
+            this.step(direction);
 
             this._render();
 
@@ -394,6 +387,12 @@
             }
 
             return (ono ? this.state.parts[index] : {}).type;
+        },
+
+        step(sign){
+            const newDatetime = this._crement(sign, this.state);
+            const newState    = this._setDateTime(newDatetime);
+            this.setState(newState, this._notify);
         },
 
         _crement(operator, state){
