@@ -233,7 +233,11 @@
             // });
         },
         _handleFocus: function _handleFocus(e) {
-            this._render();
+            if (e.target.selectionStart != e.target.selectionEnd) {
+                e.preventDefault();
+                e.target.focus();
+                this._handleMouseDown(e);
+            }
         },
         _handleMouseDown: function _handleMouseDown(e) {
 
@@ -298,25 +302,21 @@
                 case KEY_UP:
                     {
                         e.preventDefault();
-                        var newDatetime = this._crement(1, this.state);
-                        var newState = this._setDateTime(newDatetime);
-                        this.setState(newState, this._notify);
+                        this.step(1);
                         break;
                     }
                 case KEY_DOWN:
                     {
                         e.preventDefault();
-                        var _newDatetime = this._crement(-1, this.state);
-                        var _newState = this._setDateTime(_newDatetime);
-                        this.setState(_newState, this._notify);
+                        this.step(-1);
                         break;
                     }
 
                 case KEY_DELETE:
                     {
                         e.preventDefault();
-                        var _newState2 = this._setDateTime(new Date(NaN));
-                        this.setState(_newState2, this._notify);
+                        var newState = this._setDateTime(new Date(NaN));
+                        this.setState(newState, this._notify);
 
                         break;
                     }
@@ -365,9 +365,7 @@
 
             var direction = Math.sign(e.wheelDelta);
 
-            var newDatetime = this._crement(direction, this.state);
-            var newState = this._setDateTime(newDatetime);
-            this.setState(newState, this._notify);
+            this.step(direction);
 
             this._render();
         },
@@ -398,6 +396,11 @@
             }
 
             return (ono ? this.state.parts[index] : {}).type;
+        },
+        step: function step(sign) {
+            var newDatetime = this._crement(sign, this.state);
+            var newState = this._setDateTime(newDatetime);
+            this.setState(newState, this._notify);
         },
         _crement: function _crement(operator, state) {
 
