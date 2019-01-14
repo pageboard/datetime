@@ -35,7 +35,8 @@
         'hour': 'Hours',
         'minute': 'Minutes',
         'second': 'Seconds',
-        'dayperiod': 'Hours'
+        'dayperiod': 'Hours',
+        'dayPeriod': 'Hours'
     };
 
     var FORMAT = {
@@ -347,7 +348,7 @@
                         // ignore if nothing
                         if (!this.state.type) {}
                         // ignore ampm
-                        if (this.state.type === 'dayperiod') return;
+                        if (this.state.type === 'dayperiod' || this.state.type === 'dayPeriod') return;
                         // ignore Weekday
                         if (this.state.type === 'weekday') return;
 
@@ -419,7 +420,7 @@
             var fnName = (this.props.useUTC ? 'UTC' : '') + hashTypeFn[type],
                 newValue = proxyTime['get' + fnName]();
 
-            if (part.type === 'dayperiod') {
+            if (part.type === 'dayperiod' || part.type === 'dayPeriod') {
                 newValue += operator * 12;
             } else if (part.type === 'weekday') {
                 newValue += operator;
