@@ -114,8 +114,16 @@ Plugin.prototype = {
 		const format = Object.assign( {}, this.props.format, {
 			timeZone: this.props.useUTC ? 'UTC': undefined
 		});
-
-		this.dtFormatter = Intl.DateTimeFormat(this.props.locale, format);
+		try {
+			this.dtFormatter = Intl.DateTimeFormat(this.props.locale, format);
+		} catch(err) {
+			if (format.timeZone && format.timeZone != "UTC") {
+					this.props.format.timeZone = format.timeZone = "UTC";
+					this.dtFormatter = Intl.DateTimeFormat(this.props.locale, format);
+			} else {
+				throw err;
+			}
+		}
 
 		let mD = new Date(this.props.minDate).getTime();
 		let MD = new Date(this.props.maxDate).getTime();
