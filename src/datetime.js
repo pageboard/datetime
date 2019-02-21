@@ -6,21 +6,21 @@
 
     /* eslint-disable no-unused-vars */
     const KEY_TAB       = 9,
-          KEY_ENTER     = 13,
-          KEY_BACKSPACE = 8,
-          KEY_DELETE    = 46,
-          KEY_ESCAPE    = 27,
-          KEY_SPACE     = 32,
-          KEY_DOWN      = 40,
-          KEY_UP        = 38,
-          KEY_LEFT      = 37,
-          KEY_RIGHT     = 39,
-          KEY_A         = 65,
-          KEY_C         = 67,
-          KEY_V         = 86,
-          KEY_D         = 68,
-          KEY_F2        = 113,
-          KEY_INSERT    = 45;
+        KEY_ENTER     = 13,
+        KEY_BACKSPACE = 8,
+        KEY_DELETE    = 46,
+        KEY_ESCAPE    = 27,
+        KEY_SPACE     = 32,
+        KEY_DOWN      = 40,
+        KEY_UP        = 38,
+        KEY_LEFT      = 37,
+        KEY_RIGHT     = 39,
+        KEY_A         = 65,
+        KEY_C         = 67,
+        KEY_V         = 86,
+        KEY_D         = 68,
+        KEY_F2        = 113,
+        KEY_INSERT    = 45;
     /* eslint-enable no-unused-vars */
 
     const DAYLEN = 86400000;
@@ -57,7 +57,7 @@
         maxDate:  NaN,
         minTime:  NaN,
         maxTime:  NaN,
-        onChange: t => {}
+        onChange: () => {}
     };
 
     window.DateTimeEntry = Plugin;
@@ -67,7 +67,7 @@
 
         const _props = Object.assign({}, defaultProps, props);
 
-        if (typeof element == "string") element = document.querySelector(element);
+        if (typeof element == 'string') element = document.querySelector(element);
         this.element  = element;
 
         this.state = {
@@ -196,8 +196,8 @@
 
             let parts, type, step = this.state.step;
 
-            if (typeof datetime == "string" && /^\d{1,2}\:\d{1,2}/.test(datetime)) {
-                datetime = "0 " + datetime;
+            if (typeof datetime == 'string' && /^\d{1,2}:\d{1,2}/.test(datetime)) {
+                datetime = '0 ' + datetime;
             }
 
             datetime = new Date(datetime);
@@ -255,8 +255,8 @@
 
             const parts = this.state.parts;
             let ss      = 0,
-                  se    = 0,
-                  cp    = e.target.selectionStart;
+                se    = 0,
+                cp    = e.target.selectionStart;
 
             const selection = parts.reduce((p, c) =>{
                 ss = se;
@@ -317,13 +317,14 @@
                     break;
                 }
 
-                case KEY_TAB:
+                case KEY_TAB: {
                     const type = this._getNextTypeInDirection(e.shiftKey ? -1 : 1);
                     if (type) {
                         e.preventDefault();
                         this.setState({type});
                     }
                     break;
+                }
 
                 case KEY_A:
                 case KEY_C: {
@@ -339,10 +340,6 @@
                     e.preventDefault();
                     // ignore non-numbers
                     if(!isFinite(e.key)) return;
-                    // ignore if nothing
-                    if(!this.state.type) {
-
-                    }
                     // ignore ampm
                     if(this.state.type === 'dayperiod' || this.state.type === 'dayPeriod') return;
                     // ignore Weekday
@@ -646,10 +643,10 @@
             this.props.onChange(this.state.datetime);
             var e;
             if (document.createEvent) {
-              e = document.createEvent('HTMLEvents');
-              e.initEvent('change', true, true);
+                e = document.createEvent('HTMLEvents');
+                e.initEvent('change', true, true);
             } else {
-              e = new Event('change', { bubbles: true, cancelable: true });
+                e = new Event('change', { bubbles: true, cancelable: true });
             }
             this.element.dispatchEvent(e);
         }
