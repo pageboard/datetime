@@ -118,7 +118,11 @@ Plugin.prototype = {
 			this.dtFormatter = Intl.DateTimeFormat(this.props.locale, format);
 		} catch(err) {
 			if (format.timeZone && format.timeZone != "UTC") {
-					this.props.format.timeZone = format.timeZone = "UTC";
+					if (this.props.useUTC) {
+						format.timeZone = "UTC";
+					} else {
+						delete format.timeZone;
+					}
 					this.dtFormatter = Intl.DateTimeFormat(this.props.locale, format);
 			} else {
 				throw err;
